@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import axios from 'axios';
 import Link from 'next/link';
-
+// interface for the property data
 interface Property {
   _id: string;
   name: string;
@@ -33,7 +32,6 @@ interface PaginationInfo {
 }
 
 export default function Home() {
-  const router = useRouter();
   const [properties, setProperties] = useState<Property[]>([]);
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     locations: [],
@@ -63,15 +61,15 @@ export default function Home() {
     try {
       setLoading(true);
       setError(null);
-      
+      // get the query parameters from the form data
       const queryParams = new URLSearchParams();
       if (filters.location) queryParams.append('location', filters.location);
       if (filters.property_type) queryParams.append('property_type', filters.property_type);
       if (filters.bedrooms) queryParams.append('bedrooms', filters.bedrooms);
       queryParams.append('page', page.toString());
-      
+      // fetch the properties from the server
       const response = await axios.get(`http://localhost:3001/api/listings?${queryParams.toString()}`);
-      
+      // if the properties are fetched successfully, set the properties and pagination
       if (response.data.success) {
         setProperties(response.data.data);
         setPagination({
@@ -89,7 +87,7 @@ export default function Home() {
       setLoading(false);
     }
   };
-
+  // fetch the filter options from the server
   const fetchFilterOptions = async () => {
     try {
       const response = await axios.get('http://localhost:3001/api/filter-options', {
@@ -113,7 +111,7 @@ export default function Home() {
     e.preventDefault();
     fetchProperties(formData, 1); // Reset to first page on new search
   };
-
+  // handle the input change in the form
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -121,7 +119,7 @@ export default function Home() {
       [name]: value
     }));
   };
-
+  // handle the page change in the pagination
   const handlePageChange = (newPage: number) => {
     fetchProperties(formData, newPage);
   };
@@ -130,7 +128,7 @@ export default function Home() {
     <div className="container mx-auto px-4 py-8">
       {/* Search Section */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 className="text-2xl font-bold mb-4">Find Your Perfect Stay</h2>
+        <h2 className="text-2xl font-bold mb-4">Find your next stay</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -204,6 +202,7 @@ export default function Home() {
           <h2 className="text-2xl font-bold">
             {formData.location ? 'Search Results' : 'Featured Properties'}
           </h2>
+          {/* display the total number of properties found */}
           {!loading && properties.length > 0 && (
             <span className="text-gray-600">
               Found {pagination.totalCount} {pagination.totalCount === 1 ? 'property' : 'properties'}
@@ -215,6 +214,7 @@ export default function Home() {
             {error}
           </div>
         )}
+        {/* display the loading spinner if the properties are still loading */}
         {loading ? (
           <div className="text-center py-8">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
@@ -222,6 +222,7 @@ export default function Home() {
           </div>
         ) : (
           <>
+            {/* display the no properties found message if no properties are found */}
             {properties.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-gray-600">No properties found matching your criteria.</p>
@@ -230,16 +231,19 @@ export default function Home() {
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {properties.map((property) => (
+                    // display the property details when user clicks on a property
                     <div
                       key={property._id}
                       className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
                     >
                       <div className="p-6">
                         <h3 className="text-xl font-semibold mb-2">
+                          {/* link to the booking page */}
                           <Link href={`/bookings?listing_id=${property._id}`} className="text-blue-600 hover:text-blue-800">
                             {property.name}
                           </Link>
                         </h3>
+                        {/* display the property summary: name, location, type, bedrooms, price, rating */}
                         <p className="text-gray-600 mb-4 line-clamp-3">{property.summary}</p>
                         <div className="space-y-2">
                           <p><span className="font-semibold">Location:</span> {property.address.market}</p>
@@ -252,6 +256,7 @@ export default function Home() {
                               : String(property.price)}{' '}
                             per night
                           </p>
+                          {/* display the rating if it exists */}
                           {property.review_scores?.review_scores_rating && (
                             <p>
                               <span className="font-semibold">Rating:</span>{' '}
@@ -267,6 +272,7 @@ export default function Home() {
                 </div>
                 
                 {/* Pagination */}
+                {/* display the pagination buttons if there are more than 1 page */}
                 {pagination.totalPages > 1 && (
                   <div className="mt-8 flex justify-center items-center space-x-2">
                     <button

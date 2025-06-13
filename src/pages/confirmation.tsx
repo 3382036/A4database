@@ -11,6 +11,7 @@ export default function ConfirmationPage() {
             <p className="text-gray-600 mb-6">
               Thank you for your booking!
             </p>
+            {/* link to go back to the search page */}
             <Link
               href="/"
               className="inline-block bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"

@@ -30,7 +30,7 @@ interface BookingFormData {
   postalAddress: string;
   homeAddress: string;
 }
-
+// Booking page for user to book a property
 export default function BookingPage() {
   const router = useRouter();
   const { listing_id } = router.query;
@@ -176,7 +176,7 @@ export default function BookingPage() {
   }
 // if property is found, show property details and booking form
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen py-12">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           <Link href="/" className="text-blue-600 hover:text-blue-800 mb-6 inline-block">
